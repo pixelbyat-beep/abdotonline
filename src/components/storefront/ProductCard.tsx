@@ -56,7 +56,7 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
           <img
             src={publicImageUrl(image.storage_path)}
             alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-contain p-6 transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
         ) : (

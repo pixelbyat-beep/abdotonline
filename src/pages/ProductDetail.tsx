@@ -109,7 +109,7 @@ export default function ProductDetail() {
         <div>
           <div className="aspect-square overflow-hidden rounded-card border border-border bg-bg-card">
             {images[activeImage] && (
-              <img src={publicImageUrl(images[activeImage].storage_path)} alt={product.name} className="h-full w-full object-cover" />
+              <img src={publicImageUrl(images[activeImage].storage_path)} alt={product.name} className="h-full w-full object-contain p-10" />
             )}
           </div>
           {images.length > 1 && (
@@ -123,7 +123,7 @@ export default function ProductDetail() {
                     i === activeImage ? 'border-accent' : 'border-border hover:border-accent/50',
                   )}
                 >
-                  <img src={publicImageUrl(img.storage_path)} alt="" className="h-full w-full object-cover" />
+                  <img src={publicImageUrl(img.storage_path)} alt="" className="h-full w-full object-contain p-1.5" />
                 </button>
               ))}
             </div>
