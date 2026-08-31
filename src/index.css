@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Brand palette — see documentation.md "Design Tokens" section before changing.
+     Values here are the dark-mode (default) palette; light-mode equivalents are
+     defined as overrides on :root.light below since Tailwind compiles these into
+     plain CSS custom properties on :root. */
+  --color-bg-main: #0a0a0a;
+  --color-bg-card: #141414;
+  --color-bg-header: #111111;
+  --color-bg-elevated: #1a1a1a;
+  --color-accent: #19d9f2;
+  --color-accent-dark: #0fb8cf;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a0a0a0;
+  --color-text-muted: #6b6b6b;
+  --color-border: #2a2a2a;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+
+  --radius-card: 8px;
+  --radius-xl: 12px;
+  --radius-btn: 6px;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Plus Jakarta Sans", var(--font-sans);
+}
+
+:root.light {
+  --color-bg-main: #ffffff;
+  --color-bg-card: #f6f6f7;
+  --color-bg-header: #ffffff;
+  --color-bg-elevated: #eeeef0;
+  --color-accent: #0c98ad;
+  --color-accent-dark: #0a7f93;
+  --color-text-primary: #0f0f10;
+  --color-text-secondary: #55555c;
+  --color-text-muted: #8b8b93;
+  --color-border: #e2e2e6;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-warning: #b45309;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #001014;
+}
+
+/* Thin scrollbar for horizontal product rows / admin tables */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
