@@ -171,7 +171,12 @@ columns/constraints):
 
 | Key | Default | Meaning |
 |---|---|---|
-| `delivery_charge_courier` | `99` | Flat courier charge |
+| `shipping_zone_local` | `49` | Courier charge — same city as `store_pincode` |
+| `shipping_zone_regional` | `79` | Courier charge — same state, different city |
+| `shipping_zone_metro` | `99` | Courier charge — metro-to-metro (see `resolveShippingZone`) |
+| `shipping_zone_national` | `129` | Courier charge — rest of India |
+| `shipping_zone_special` | `199` | Courier charge — J&K / North-East / islands |
+| `store_pincode`, `store_state` | `400001`, `Maharashtra` | Dispatch origin used to resolve the shipping zone |
 | `delivery_charge_free_above` | `999` | Courier becomes free above this subtotal |
 | `delivery_email_charge` | `0` | Email delivery charge |
 | `cod_extra_charge` | `30` | Extra charge if Cash on Delivery selected |
@@ -252,10 +257,14 @@ cryptographically secure on its own.
 
 1. Customer adds items to cart (stored in `localStorage` via Zustand — works with
    zero login).
-2. At Checkout, they enter **name, email, phone** (and address, only if Courier is
-   selected) — never asked to create an account.
-3. `create-order` Edge Function builds the order and, for online payment, a Razorpay
-   order.
+2. Checkout is a 3-step wizard: **(1) email**, **(2) name/phone + address** (address
+   fields only appear if Courier is selected — the shipping charge is calculated live
+   from the pincode/state via `resolveShippingZone` in `src/lib/shipping.ts`, mirrored
+   server-side in `supabase/functions/_shared/shipping.ts`), **(3) payment method**.
+   Never asked to create an account.
+3. `create-order` Edge Function re-prices everything server-side — including
+   re-resolving the shipping zone from the submitted address — and builds the order,
+   plus a Razorpay order for online payment.
 4. Razorpay Checkout.js opens. On success, the browser immediately calls
    `razorpay-webhook` with the payment signature to confirm it server-side.
 5. Customer lands on Order Success, which polls `track-order` every 3s (up to ~45s)

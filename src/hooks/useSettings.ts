@@ -3,7 +3,13 @@ import { supabase } from '@/lib/supabaseClient'
 import type { SettingsMap } from '@/types/domain'
 
 const DEFAULTS: SettingsMap = {
-  delivery_charge_courier: 99,
+  shipping_zone_local: 49,
+  shipping_zone_regional: 79,
+  shipping_zone_metro: 99,
+  shipping_zone_national: 129,
+  shipping_zone_special: 199,
+  store_pincode: '400001',
+  store_state: 'Maharashtra',
   delivery_charge_free_above: 999,
   delivery_email_charge: 0,
   cod_extra_charge: 30,
@@ -16,7 +22,11 @@ const DEFAULTS: SettingsMap = {
 }
 
 const NUMERIC_KEYS = new Set([
-  'delivery_charge_courier',
+  'shipping_zone_local',
+  'shipping_zone_regional',
+  'shipping_zone_metro',
+  'shipping_zone_national',
+  'shipping_zone_special',
   'delivery_charge_free_above',
   'delivery_email_charge',
   'cod_extra_charge',

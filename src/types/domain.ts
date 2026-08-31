@@ -38,7 +38,13 @@ export interface CartLine {
 }
 
 export interface SettingsMap {
-  delivery_charge_courier: number
+  shipping_zone_local: number
+  shipping_zone_regional: number
+  shipping_zone_metro: number
+  shipping_zone_national: number
+  shipping_zone_special: number
+  store_pincode: string
+  store_state: string
   delivery_charge_free_above: number
   delivery_email_charge: number
   cod_extra_charge: number

@@ -1,5 +1,6 @@
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts'
+import { resolveShippingZone, shippingChargeForZone } from '../_shared/shipping.ts'
 
 interface RequestBody {
   guest: { name: string; email: string; phone: string }
@@ -68,17 +69,44 @@ Deno.serve(async (req) => {
     const { data: settingsRows } = await admin
       .from('settings')
       .select('key, value')
-      .in('key', ['delivery_charge_courier', 'delivery_charge_free_above', 'delivery_email_charge', 'cod_extra_charge'])
-    const settings = Object.fromEntries((settingsRows ?? []).map((r: { key: string; value: string }) => [r.key, Number(r.value)]))
+      .in('key', [
+        'shipping_zone_local',
+        'shipping_zone_regional',
+        'shipping_zone_metro',
+        'shipping_zone_national',
+        'shipping_zone_special',
+        'store_pincode',
+        'store_state',
+        'delivery_charge_free_above',
+        'delivery_email_charge',
+        'cod_extra_charge',
+      ])
+    const settingsMap = Object.fromEntries((settingsRows ?? []).map((r: { key: string; value: string }) => [r.key, r.value]))
+    const numeric = (key: string, fallback: number) => (settingsMap[key] !== undefined ? Number(settingsMap[key]) : fallback)
+    const rates = {
+      shipping_zone_local: numeric('shipping_zone_local', 49),
+      shipping_zone_regional: numeric('shipping_zone_regional', 79),
+      shipping_zone_metro: numeric('shipping_zone_metro', 99),
+      shipping_zone_national: numeric('shipping_zone_national', 129),
+      shipping_zone_special: numeric('shipping_zone_special', 199),
+    }
 
     const afterDiscount = subtotal - discountAmount
     let deliveryCharge = 0
     if (body.deliveryType === 'email') {
-      deliveryCharge = settings.delivery_email_charge ?? 0
-    } else {
-      deliveryCharge = afterDiscount >= (settings.delivery_charge_free_above ?? 999) ? 0 : (settings.delivery_charge_courier ?? 99)
+      deliveryCharge = numeric('delivery_email_charge', 0)
+    } else if (afterDiscount >= numeric('delivery_charge_free_above', 999)) {
+      deliveryCharge = 0
+    } else if (body.address) {
+      const zone = resolveShippingZone(
+        body.address.pincode,
+        settingsMap.store_pincode ?? '',
+        body.address.state,
+        settingsMap.store_state ?? '',
+      )
+      deliveryCharge = shippingChargeForZone(zone, rates)
     }
-    const codCharge = body.paymentMethod === 'cod' ? settings.cod_extra_charge ?? 0 : 0
+    const codCharge = body.paymentMethod === 'cod' ? numeric('cod_extra_charge', 30) : 0
     const total = afterDiscount + deliveryCharge + codCharge
 
     // Unique order number (retry on rare collision)
