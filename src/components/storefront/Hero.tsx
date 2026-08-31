@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
-import { HeroBackground } from './HeroBackground'
 
 export function Hero() {
   return (
     <section className="relative min-h-[520px] overflow-hidden border-b border-border bg-bg-main md:min-h-[600px]">
       <div className="pointer-events-none absolute inset-0">
-        <HeroBackground />
+        <img src="/hero/homeblack.png" alt="" className="hidden h-full w-full object-cover dark:block" />
+        <img src="/hero/homewhite.png" alt="" className="block h-full w-full object-cover dark:hidden" />
         <div className="absolute inset-0 bg-gradient-to-r from-bg-main from-5% via-bg-main/60 via-45% to-transparent to-80%" />
       </div>
 
