@@ -51,7 +51,7 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
       to={`/product/${product.slug}`}
       className="group relative flex flex-col overflow-hidden rounded-card border border-border bg-bg-card transition-all hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_10px_40px_rgba(0,0,0,0.6)]"
     >
-      <div className="relative aspect-square w-full overflow-hidden bg-bg-elevated">
+      <div className="relative aspect-square w-full overflow-hidden bg-white">
         {image ? (
           <img
             src={publicImageUrl(image.storage_path)}

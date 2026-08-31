@@ -32,7 +32,7 @@ export default function AllProducts() {
       render: (r) => {
         const image = r.product_images.find((i) => i.is_primary) ?? r.product_images[0]
         return image ? (
-          <img src={publicImageUrl(image.storage_path)} alt="" className="h-11 w-11 rounded-btn bg-bg-elevated object-contain p-0.5" />
+          <img src={publicImageUrl(image.storage_path)} alt="" className="h-11 w-11 rounded-btn bg-white object-contain p-0.5" />
         ) : (
           <div className="flex h-11 w-11 items-center justify-center rounded-btn bg-bg-elevated text-text-muted">
             <ImageOff size={16} />

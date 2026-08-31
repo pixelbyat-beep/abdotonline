@@ -107,7 +107,7 @@ export default function ProductDetail() {
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
         {/* Gallery */}
         <div>
-          <div className="aspect-square overflow-hidden rounded-card border border-border bg-bg-card">
+          <div className="aspect-square overflow-hidden rounded-card border border-border bg-white">
             {images[activeImage] && (
               <img src={publicImageUrl(images[activeImage].storage_path)} alt={product.name} className="h-full w-full object-contain p-10" />
             )}
