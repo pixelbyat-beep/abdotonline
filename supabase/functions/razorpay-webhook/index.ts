@@ -33,8 +33,9 @@ async function markOrderPaid(admin: ReturnType<typeof supabaseAdmin>, razorpayOr
     .update({ razorpay_payment_id: razorpayPaymentId, razorpay_signature: razorpaySignature, status: 'paid' })
     .eq('id', payment.id)
 
-  const newOrderStatus = order.delivery_type === 'email' ? 'delivered' : 'processing'
-  await admin.from('orders').update({ payment_status: 'paid', order_status: newOrderStatus }).eq('id', order.id)
+  // Email orders no longer jump straight to 'delivered' on payment — the key hasn't
+  // actually gone out yet. send-license-email flips it to 'delivered' once it has.
+  await admin.from('orders').update({ payment_status: 'paid', order_status: 'processing' }).eq('id', order.id)
 
   if (order.coupon_code) {
     const { data: coupon } = await admin.from('coupons').select('id, used_count').eq('code', order.coupon_code).single()

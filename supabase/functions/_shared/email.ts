@@ -9,8 +9,7 @@ async function getFromEmail(admin: AdminClient): Promise<string> {
 async function sendViaResend(to: string, subject: string, html: string, from: string): Promise<void> {
   const apiKey = Deno.env.get('RESEND_API_KEY')
   if (!apiKey) {
-    console.error('RESEND_API_KEY not set — skipping email send. Configure it with: supabase secrets set RESEND_API_KEY=...')
-    return
+    throw new Error('RESEND_API_KEY not set. Configure it with: supabase secrets set RESEND_API_KEY=...')
   }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -18,7 +17,7 @@ async function sendViaResend(to: string, subject: string, html: string, from: st
     body: JSON.stringify({ from: `AbDotStore <${from}>`, to: [to], subject, html }),
   })
   if (!res.ok) {
-    console.error('Resend API error:', await res.text())
+    throw new Error(`Resend API error: ${await res.text()}`)
   }
 }
 

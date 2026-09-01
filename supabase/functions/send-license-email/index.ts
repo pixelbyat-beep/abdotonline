@@ -28,7 +28,10 @@ Deno.serve(async (req) => {
 
     const { data: items } = await admin.from('order_items').select('*, license_keys(key_value)').eq('order_id', orderId)
     await sendLicenseKeyEmail(admin, order, items ?? [], message)
-    await admin.from('orders').update({ license_key_sent_at: new Date().toISOString() }).eq('id', orderId)
+    await admin
+      .from('orders')
+      .update({ license_key_sent_at: new Date().toISOString(), order_status: 'delivered' })
+      .eq('id', orderId)
 
     return jsonResponse({ ok: true })
   } catch (e) {
