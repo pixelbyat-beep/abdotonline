@@ -5,6 +5,7 @@ import { lookupOrder, type OrderLookupResult } from '@/hooks/useOrderLookup'
 import { formatINR } from '@/lib/formatters'
 import { toast } from '@/store/toastStore'
 import { Button } from '@/components/ui/Button'
+import { ReceiptPrintHeader, DownloadReceiptButton } from '@/components/storefront/OrderReceipt'
 
 const POLL_INTERVAL_MS = 3000
 const MAX_ATTEMPTS = 15
@@ -71,8 +72,10 @@ export default function OrderSuccess() {
   const stillConfirming = confirming && result.paymentStatus === 'pending' && result.paymentMethod === 'online'
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-14 md:px-6">
-      <div className="flex flex-col items-center text-center">
+    <div className="mx-auto max-w-2xl px-4 py-14 print:py-0 md:px-6 print:text-black">
+      <ReceiptPrintHeader orderNumber={result.orderNumber} createdAt={result.createdAt} email={email} />
+
+      <div className="flex flex-col items-center text-center print:hidden">
         {stillConfirming ? (
           <Loader2 className="mb-4 animate-spin text-accent" size={44} />
         ) : (
@@ -117,7 +120,7 @@ export default function OrderSuccess() {
       </div>
 
       {!stillConfirming && result.deliveryType === 'email' && (
-        <div className="mt-6 rounded-card border border-accent/30 bg-accent/5 p-5">
+        <div className="mt-6 rounded-card border border-accent/30 bg-accent/5 p-5 print:hidden">
           <div className="mb-2 flex items-center gap-2 text-accent">
             <Mail size={18} />
             <h3 className="font-semibold">Check your email</h3>
@@ -131,7 +134,7 @@ export default function OrderSuccess() {
       )}
 
       {!stillConfirming && result.deliveryType === 'courier' && (
-        <div className="mt-6 rounded-card border border-border bg-bg-card p-5">
+        <div className="mt-6 rounded-card border border-border bg-bg-card p-5 print:hidden">
           <h3 className="mb-2 font-semibold text-text-primary">Shipping Status</h3>
           <p className="text-sm text-text-secondary">
             {result.trackingNumber
@@ -141,7 +144,8 @@ export default function OrderSuccess() {
         </div>
       )}
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+      <div className="mt-8 flex flex-col gap-3 print:hidden sm:flex-row sm:justify-center">
+        {!stillConfirming && <DownloadReceiptButton />}
         <Link to="/track-order">
           <Button variant="outline">Track This Order</Button>
         </Link>

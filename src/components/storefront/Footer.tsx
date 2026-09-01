@@ -14,7 +14,7 @@ const categories = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-bg-header pb-20 pt-12 md:pb-8">
+    <footer className="border-t border-border bg-bg-header pb-20 pt-12 md:pb-8 print:hidden">
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 md:grid-cols-5 md:px-6">
         <div className="col-span-2 md:col-span-1">
           <span className="flex items-center gap-2">
