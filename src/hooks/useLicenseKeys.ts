@@ -31,6 +31,20 @@ export function useAddLicenseKeys() {
   })
 }
 
+export function useDeleteLicenseKey() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('license_keys').delete().eq('id', id).eq('status', 'unused')
+      if (error) throw error
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'license-keys'] })
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] })
+    },
+  })
+}
+
 export function useLowStockProducts(threshold: number) {
   return useQuery({
     queryKey: ['admin', 'low-stock', threshold],

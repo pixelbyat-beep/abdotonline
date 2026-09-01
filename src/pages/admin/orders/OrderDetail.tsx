@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Printer, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Printer, Send } from 'lucide-react'
 import { useAdminOrder, useUpdateOrderStatus } from '@/hooks/useAdminOrders'
 import { OrderStatusBadge, PaymentStatusBadge } from '@/components/admin/OrderStatusBadge'
 import { WhatsAppNotifyButton } from '@/components/admin/WhatsAppNotifyButton'
@@ -19,7 +19,8 @@ export default function OrderDetail() {
   const updateStatus = useUpdateOrderStatus(id!)
   const [tracking, setTracking] = useState('')
   const [courier, setCourier] = useState(COURIERS[0])
-  const [resending, setResending] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [emailMessage, setEmailMessage] = useState('')
 
   if (isLoading || !order) return <p className="text-text-secondary">Loading...</p>
 
@@ -38,21 +39,22 @@ export default function OrderDetail() {
     refetch()
   }
 
-  async function handleResendEmail() {
-    setResending(true)
+  async function handleSendLicenseEmail() {
+    setSending(true)
     const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
     const { data: sessionData } = await supabase.auth.getSession()
     const res = await fetch(edgeFunctionUrl('send-license-email'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: anonKey, Authorization: `Bearer ${sessionData.session?.access_token}` },
-      body: JSON.stringify({ orderId: currentOrder.id }),
+      body: JSON.stringify({ orderId: currentOrder.id, message: emailMessage.trim() || undefined }),
     })
-    setResending(false)
+    setSending(false)
     if (!res.ok) {
-      toast('Could not resend email', 'error')
+      toast('Could not send email', 'error')
       return
     }
-    toast('License key email resent', 'success')
+    toast('License key email sent', 'success')
+    refetch()
   }
 
   async function handleMarkCashCollected() {
@@ -120,11 +122,26 @@ export default function OrderDetail() {
             <section className="rounded-card border border-border bg-bg-card p-5 print:hidden">
               <h2 className="mb-3 text-sm font-semibold text-text-primary">License Key Delivery</h2>
               <p className="mb-3 text-sm text-text-secondary">
-                {order.payment_status === 'paid' ? 'License key has been sent to the customer email.' : 'Waiting for payment confirmation.'}
+                {order.payment_status !== 'paid'
+                  ? 'Waiting for payment confirmation.'
+                  : order.license_key_sent_at
+                    ? `License key email sent on ${formatDateTime(order.license_key_sent_at)}.`
+                    : "A key is reserved for this order. Nothing is sent automatically — write your message below and send it whenever you're ready."}
               </p>
-              <Button variant="outline" onClick={handleResendEmail} disabled={resending || order.payment_status !== 'paid'}>
-                <RefreshCw size={14} /> Resend License Key Email
-              </Button>
+              {order.payment_status === 'paid' && (
+                <>
+                  <textarea
+                    value={emailMessage}
+                    onChange={(e) => setEmailMessage(e.target.value)}
+                    placeholder="e.g. Thanks for your order! Here's your license key:"
+                    rows={4}
+                    className="mb-3 w-full rounded-btn border border-border bg-bg-elevated p-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+                  />
+                  <Button variant="outline" onClick={handleSendLicenseEmail} disabled={sending}>
+                    <Send size={14} /> {order.license_key_sent_at ? 'Resend License Key Email' : 'Send License Key Email'}
+                  </Button>
+                </>
+              )}
             </section>
           )}
 

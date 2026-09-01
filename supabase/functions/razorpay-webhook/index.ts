@@ -13,7 +13,7 @@
 //    customer closes their browser tab before the client-side call above fires.
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts'
-import { sendLicenseKeyEmail, sendOrderConfirmationEmail } from '../_shared/email.ts'
+import { sendOrderConfirmationEmail } from '../_shared/email.ts'
 
 async function hmacHex(secret: string, payload: string): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
@@ -44,6 +44,9 @@ async function markOrderPaid(admin: ReturnType<typeof supabaseAdmin>, razorpayOr
   const { data: items } = await admin.from('order_items').select('*').eq('order_id', order.id)
 
   if (order.delivery_type === 'email' && items) {
+    // Reserve a key for each item so it can't be sold twice. The admin decides
+    // when — and with what message — to actually email it to the customer,
+    // via the "Send License Key Email" button on the order detail page.
     for (const item of items) {
       const { data: key } = await admin
         .from('license_keys')
@@ -59,9 +62,6 @@ async function markOrderPaid(admin: ReturnType<typeof supabaseAdmin>, razorpayOr
         await admin.from('order_items').update({ license_key_id: key.id }).eq('id', item.id)
       }
     }
-
-    const { data: itemsWithKeys } = await admin.from('order_items').select('*, license_keys(key_value)').eq('order_id', order.id)
-    await sendLicenseKeyEmail(admin, order, itemsWithKeys ?? [])
   } else {
     await sendOrderConfirmationEmail(admin, order)
   }

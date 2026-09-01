@@ -33,6 +33,7 @@ export async function sendLicenseKeyEmail(
   admin: AdminClient,
   order: { order_number: string; guest_name: string | null; guest_email: string | null; total: number },
   items: OrderItemForEmail[],
+  customMessage?: string,
 ): Promise<void> {
   if (!order.guest_email) return
   const from = await getFromEmail(admin)
@@ -48,11 +49,21 @@ export async function sendLicenseKeyEmail(
     )
     .join('')
 
+  // The admin writes this each time they send — falls back to a generic line if left blank.
+  const defaultMessage = `Thank you for your order <strong>#${order.order_number}</strong>! Here ${items.length > 1 ? 'are' : 'is'} your license key${items.length > 1 ? 's' : ''}:`
+  const messageHtml = customMessage
+    ? customMessage
+        .split('\n')
+        .filter((line) => line.trim().length > 0)
+        .map((line) => `<p>${line}</p>`)
+        .join('')
+    : `<p>${defaultMessage}</p>`
+
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;background:#0a0a0a;color:#fff;padding:32px 24px;">
       <h1 style="color:#19D9F2;font-size:20px;">AbDotStore</h1>
       <p>Hi ${order.guest_name || 'there'},</p>
-      <p>Thank you for your order <strong>#${order.order_number}</strong>! Here ${items.length > 1 ? 'are' : 'is'} your license key${items.length > 1 ? 's' : ''}:</p>
+      ${messageHtml}
       ${keysHtml}
       <p style="color:#a0a0a0;font-size:13px;">Please keep this email safe — your license key is single-use. If you have any trouble activating it, reply to this email or visit our support page.</p>
       <p style="margin-top:24px;">— The AbDotStore Team<br/><em>Smart. Secure. Genuine.</em></p>

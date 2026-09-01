@@ -97,6 +97,7 @@ export interface Database {
           tracking_number: string | null
           courier: string | null
           order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+          license_key_sent_at: string | null
           created_at: string
         }
         Insert: Partial<Database['public']['Tables']['orders']['Row']> & { order_number: string; delivery_type: 'email' | 'courier' }

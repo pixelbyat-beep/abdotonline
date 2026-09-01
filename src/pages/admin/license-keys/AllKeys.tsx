@@ -1,4 +1,4 @@
-import { useLicenseKeys } from '@/hooks/useLicenseKeys'
+import { useLicenseKeys, useDeleteLicenseKey } from '@/hooks/useLicenseKeys'
 import { DataTable, type Column } from '@/components/admin/DataTable'
 import { Badge } from '@/components/ui/Badge'
 import { maskLicenseKey, formatDate } from '@/lib/formatters'
@@ -16,6 +16,7 @@ const TONE = { unused: 'success', used: 'neutral', expired: 'danger' } as const
 
 export default function AllKeys() {
   const { data, isLoading } = useLicenseKeys()
+  const deleteKey = useDeleteLicenseKey()
 
   const columns: Column<KeyRow>[] = [
     { header: 'Product', render: (r) => r.products?.name ?? '—' },
@@ -24,6 +25,22 @@ export default function AllKeys() {
     { header: 'Order', render: (r) => r.orders?.order_number ?? '—' },
     { header: 'Customer Email', render: (r) => r.orders?.guest_email ?? '—' },
     { header: 'Used At', render: (r) => (r.used_at ? formatDate(r.used_at) : '—') },
+    {
+      header: 'Actions',
+      render: (r) =>
+        r.status === 'unused' ? (
+          <button
+            onClick={() => {
+              if (confirm('Delete this unused license key?')) deleteKey.mutate(r.id)
+            }}
+            className="text-danger hover:underline"
+          >
+            Delete
+          </button>
+        ) : (
+          <span className="text-text-muted">—</span>
+        ),
+    },
   ]
 
   return (

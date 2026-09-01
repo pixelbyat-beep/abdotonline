@@ -28,7 +28,9 @@ Deno.serve(async (req) => {
       .select('qty, price, product_name_snapshot, license_keys(key_value)')
       .eq('order_id', order.id)
 
-    const includeKeys = order.payment_status === 'paid' && order.delivery_type === 'email'
+    // Only reveal the key once the admin has actually sent it — payment being
+    // captured doesn't mean the key has gone out yet (that's a manual step now).
+    const includeKeys = order.payment_status === 'paid' && order.delivery_type === 'email' && !!order.license_key_sent_at
 
     return jsonResponse({
       found: true,
