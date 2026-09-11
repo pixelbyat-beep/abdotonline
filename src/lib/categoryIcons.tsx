@@ -1,4 +1,5 @@
 import { ShieldCheck, Shield, Globe, AppWindow, Calculator, Server, Gamepad2, Package, type LucideIcon } from 'lucide-react'
+import { publicImageUrl } from '@/lib/supabaseClient'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   'shield-check': ShieldCheck,
@@ -10,7 +11,15 @@ const ICON_MAP: Record<string, LucideIcon> = {
   'gamepad-2': Gamepad2,
 }
 
-export function CategoryIcon({ icon, ...props }: { icon: string | null } & React.ComponentProps<LucideIcon>) {
+/** A category `icon` value is either an uploaded image (storage path / URL) or a legacy icon key from ICON_MAP. */
+export function isCategoryImageIcon(icon: string | null): boolean {
+  return !!icon && !(icon in ICON_MAP)
+}
+
+export function CategoryIcon({ icon, size = 24, className }: { icon: string | null; size?: number; className?: string }) {
+  if (isCategoryImageIcon(icon)) {
+    return <img src={publicImageUrl(icon!)} alt="" style={{ width: size, height: size }} className={`rounded object-contain ${className ?? ''}`} />
+  }
   const Icon = (icon && ICON_MAP[icon]) || Package
-  return <Icon {...props} />
+  return <Icon size={size} className={className} />
 }
