@@ -41,9 +41,21 @@ export interface ShippingZoneRates {
   shipping_zone_metro: number
   shipping_zone_national: number
   shipping_zone_special: number
+  /** Weight covered by the zone's base rate, in kg. */
+  shipping_base_weight_kg: number
+  /** Size of each extra weight slab beyond the base weight, in kg. */
+  shipping_weight_step_kg: number
+  shipping_addl_local: number
+  shipping_addl_regional: number
+  shipping_addl_metro: number
+  shipping_addl_national: number
+  shipping_addl_special: number
 }
 
-export function shippingChargeForZone(zone: ShippingZone, rates: ShippingZoneRates): number {
+/** Fallback weight (kg) for a product or cart line that has none recorded. */
+export const DEFAULT_ITEM_WEIGHT_KG = 0.5
+
+export function zoneBaseRate(zone: ShippingZone, rates: ShippingZoneRates): number {
   switch (zone) {
     case 'local':
       return rates.shipping_zone_local
@@ -57,4 +69,33 @@ export function shippingChargeForZone(zone: ShippingZone, rates: ShippingZoneRat
     default:
       return rates.shipping_zone_national
   }
+}
+
+export function zoneAdditionalRate(zone: ShippingZone, rates: ShippingZoneRates): number {
+  switch (zone) {
+    case 'local':
+      return rates.shipping_addl_local
+    case 'regional':
+      return rates.shipping_addl_regional
+    case 'metro':
+      return rates.shipping_addl_metro
+    case 'special':
+      return rates.shipping_addl_special
+    case 'national':
+    default:
+      return rates.shipping_addl_national
+  }
+}
+
+/** Number of extra weight slabs billed beyond the zone's base weight. */
+export function extraWeightSlabs(totalWeightKg: number, rates: ShippingZoneRates): number {
+  const step = rates.shipping_weight_step_kg > 0 ? rates.shipping_weight_step_kg : 0.5
+  const over = totalWeightKg - rates.shipping_base_weight_kg
+  // Round to 3 dp first so float noise (e.g. 1.0000000002 kg) can't bill a phantom slab.
+  return over > 0.0005 ? Math.ceil(Math.round(over * 1000) / 1000 / step - 1e-9) : 0
+}
+
+/** Courier charge = zone base rate (covers the base weight) + per-slab surcharge for the extra weight. */
+export function shippingChargeForZone(zone: ShippingZone, rates: ShippingZoneRates, totalWeightKg = 0): number {
+  return zoneBaseRate(zone, rates) + extraWeightSlabs(totalWeightKg, rates) * zoneAdditionalRate(zone, rates)
 }

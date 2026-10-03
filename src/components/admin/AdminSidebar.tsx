@@ -14,12 +14,12 @@ import {
   BarChart3,
   FileText,
   Settings,
-  ShoppingBag,
   ChevronDown,
   X,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { AdminLogo } from './AdminLogo'
 
 interface NavChild {
   label: string
@@ -150,18 +150,11 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
   }, [pathname])
 
   return (
-    <div className="flex h-full w-64 flex-col overflow-y-auto border-r border-[#242731] bg-[#14161b] scrollbar-thin">
-      <div className="flex items-center justify-between gap-2 border-b border-[#242731] px-4 py-4">
-        <span className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-black">
-            <ShoppingBag size={16} strokeWidth={2.5} />
-          </span>
-          <span className="text-[15px] font-bold text-white">
-            Ab<span className="text-accent">Dot</span>Store
-          </span>
-        </span>
+    <div className="flex h-full w-64 flex-col overflow-y-auto border-r border-border bg-bg-card scrollbar-thin">
+      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-4">
+        <AdminLogo subtitle="Admin Console" />
         {onNavigate && (
-          <button onClick={onNavigate} className="text-white/70 hover:text-white md:hidden">
+          <button onClick={onNavigate} className="rounded-lg p-1.5 text-text-secondary hover:bg-bg-elevated md:hidden">
             <X size={20} />
           </button>
         )}
@@ -179,7 +172,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 className={cn(
                   'mb-0.5 flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] font-medium transition-colors',
-                  active ? 'bg-accent/15 text-accent' : 'text-white/70 hover:bg-white/5 hover:text-white',
+                  active ? 'bg-accent/10 font-semibold text-accent' : 'text-text-secondary hover:bg-bg-elevated hover:text-text-primary',
                 )}
               >
                 <group.icon size={17} strokeWidth={2} />
@@ -196,7 +189,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={() => setOpenLabel(open ? null : group.label)}
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px] font-medium transition-colors',
-                  active ? 'text-accent' : 'text-white/70 hover:bg-white/5 hover:text-white',
+                  active ? 'bg-accent/10 font-semibold text-accent' : 'text-text-secondary hover:bg-bg-elevated hover:text-text-primary',
                 )}
               >
                 <group.icon size={17} strokeWidth={2} />
@@ -204,7 +197,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
                 <ChevronDown size={14} className={cn('shrink-0 transition-transform', open && 'rotate-180')} />
               </button>
               {open && (
-                <div className="mt-0.5 ml-[22px] flex flex-col gap-0.5 border-l border-[#2a2d38] pl-4">
+                <div className="mt-0.5 ml-[22px] flex flex-col gap-0.5 border-l-2 border-border pl-3">
                   {group.children.map((child) => (
                     <NavLink
                       key={child.href}
@@ -214,7 +207,7 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
                       className={({ isActive }) =>
                         cn(
                           'rounded-lg px-3 py-2 text-[13px] transition-colors',
-                          isActive ? 'bg-accent/15 font-medium text-accent' : 'text-white/60 hover:bg-white/5 hover:text-white',
+                          isActive ? 'bg-accent/10 font-semibold text-accent' : 'text-text-secondary hover:bg-bg-elevated hover:text-text-primary',
                         )
                       }
                     >

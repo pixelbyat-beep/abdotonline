@@ -68,6 +68,7 @@ export default function ProductDetail() {
       image: images[0] ? publicImageUrl(images[0].storage_path) : '',
       deliveryType: product.delivery_type,
       stockQty: product.stock_qty,
+      weightKg: product.weight_kg,
     })
     toast(`${product.name} added to cart`, 'success')
   }

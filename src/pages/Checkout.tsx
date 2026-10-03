@@ -8,7 +8,7 @@ import { supabase, edgeFunctionUrl } from '@/lib/supabaseClient'
 import { openRazorpayCheckout } from '@/lib/razorpay'
 import { formatINR } from '@/lib/formatters'
 import { toast } from '@/store/toastStore'
-import { resolveShippingZone, shippingChargeForZone, ZONE_LABELS } from '@/lib/shipping'
+import { DEFAULT_ITEM_WEIGHT_KG, resolveShippingZone, shippingChargeForZone, ZONE_LABELS } from '@/lib/shipping'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
@@ -52,6 +52,7 @@ export default function Checkout() {
   const subtotal = cartSubtotal(items)
   const discount = coupon ? (coupon.type === 'percent' ? Math.round((subtotal * coupon.value) / 100) : Math.min(coupon.value, subtotal)) : 0
   const afterDiscount = subtotal - discount
+  const totalWeightKg = items.reduce((sum, i) => sum + (i.weightKg ?? DEFAULT_ITEM_WEIGHT_KG) * i.qty, 0)
 
   const zone = useMemo(() => {
     if (deliveryType !== 'courier' || !settings) return null
@@ -66,8 +67,8 @@ export default function Checkout() {
     if (deliveryType === 'email') return settings.delivery_email_charge
     if (freeShipping) return 0
     if (!zone) return 0
-    return shippingChargeForZone(zone, settings)
-  }, [settings, deliveryType, freeShipping, zone])
+    return shippingChargeForZone(zone, settings, totalWeightKg)
+  }, [settings, deliveryType, freeShipping, zone, totalWeightKg])
 
   const codCharge = paymentMethod === 'cod' && settings ? settings.cod_extra_charge : 0
   const total = afterDiscount + deliveryCharge + codCharge
@@ -315,7 +316,7 @@ export default function Checkout() {
                     {freeShipping
                       ? 'Your order qualifies for free shipping.'
                       : zone
-                        ? `Shipping zone: ${ZONE_LABELS[zone]} — ${formatINR(shippingChargeForZone(zone, settings!))}`
+                        ? `Shipping zone: ${ZONE_LABELS[zone]} · ${totalWeightKg.toFixed(2)} kg — ${formatINR(shippingChargeForZone(zone, settings!, totalWeightKg))}`
                         : 'Enter your city, state and pincode to calculate the courier charge.'}
                   </div>
                 )}

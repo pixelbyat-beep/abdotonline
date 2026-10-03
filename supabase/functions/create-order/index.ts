@@ -1,6 +1,6 @@
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { supabaseAdmin } from '../_shared/supabaseAdmin.ts'
-import { resolveShippingZone, shippingChargeForZone } from '../_shared/shipping.ts'
+import { DEFAULT_ITEM_WEIGHT_KG, resolveShippingZone, shippingChargeForZone } from '../_shared/shipping.ts'
 
 interface RequestBody {
   guest: { name: string; email: string; phone: string }
@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     const productIds = body.items.map((i) => i.productId)
     const { data: products, error: productsError } = await admin
       .from('products')
-      .select('id, name, price, delivery_type, stock_qty')
+      .select('id, name, price, delivery_type, stock_qty, weight_kg')
       .in('id', productIds)
       .eq('status', 'active')
 
@@ -43,9 +43,11 @@ Deno.serve(async (req) => {
     }
 
     let subtotal = 0
+    let totalWeightKg = 0
     const orderItemsInput = body.items.map((item) => {
       const product = products.find((p: { id: string; price: number }) => p.id === item.productId)!
       subtotal += Number(product.price) * item.qty
+      totalWeightKg += (product.weight_kg != null ? Number(product.weight_kg) : DEFAULT_ITEM_WEIGHT_KG) * item.qty
       return { productId: item.productId, qty: item.qty, price: Number(product.price), name: product.name }
     })
 
@@ -75,6 +77,13 @@ Deno.serve(async (req) => {
         'shipping_zone_metro',
         'shipping_zone_national',
         'shipping_zone_special',
+        'shipping_base_weight_kg',
+        'shipping_weight_step_kg',
+        'shipping_addl_local',
+        'shipping_addl_regional',
+        'shipping_addl_metro',
+        'shipping_addl_national',
+        'shipping_addl_special',
         'store_pincode',
         'store_state',
         'delivery_charge_free_above',
@@ -89,6 +98,13 @@ Deno.serve(async (req) => {
       shipping_zone_metro: numeric('shipping_zone_metro', 99),
       shipping_zone_national: numeric('shipping_zone_national', 129),
       shipping_zone_special: numeric('shipping_zone_special', 199),
+      shipping_base_weight_kg: numeric('shipping_base_weight_kg', 0.5),
+      shipping_weight_step_kg: numeric('shipping_weight_step_kg', 0.5),
+      shipping_addl_local: numeric('shipping_addl_local', 20),
+      shipping_addl_regional: numeric('shipping_addl_regional', 30),
+      shipping_addl_metro: numeric('shipping_addl_metro', 35),
+      shipping_addl_national: numeric('shipping_addl_national', 50),
+      shipping_addl_special: numeric('shipping_addl_special', 90),
     }
 
     const afterDiscount = subtotal - discountAmount
@@ -104,7 +120,7 @@ Deno.serve(async (req) => {
         body.address.state,
         settingsMap.store_state ?? '',
       )
-      deliveryCharge = shippingChargeForZone(zone, rates)
+      deliveryCharge = shippingChargeForZone(zone, rates, totalWeightKg)
     }
     const codCharge = body.paymentMethod === 'cod' ? numeric('cod_extra_charge', 30) : 0
     const total = afterDiscount + deliveryCharge + codCharge

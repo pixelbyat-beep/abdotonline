@@ -32,7 +32,7 @@ export function Pagination({
             onClick={() => onChange(p)}
             className={cn(
               'flex h-9 w-9 items-center justify-center rounded-full border text-sm transition-colors',
-              p === page ? 'border-accent bg-accent text-black font-semibold' : 'border-border text-text-primary hover:border-accent',
+              p === page ? 'border-accent bg-accent text-on-accent font-semibold' : 'border-border text-text-primary hover:border-accent',
             )}
           >
             {p}

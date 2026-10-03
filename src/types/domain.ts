@@ -35,6 +35,8 @@ export interface CartLine {
   image: string
   deliveryType: Product['delivery_type']
   stockQty: number
+  /** Per-unit weight in kg; carts saved before weight-based shipping don't have it. */
+  weightKg?: number
 }
 
 export interface SettingsMap {
@@ -43,6 +45,13 @@ export interface SettingsMap {
   shipping_zone_metro: number
   shipping_zone_national: number
   shipping_zone_special: number
+  shipping_base_weight_kg: number
+  shipping_weight_step_kg: number
+  shipping_addl_local: number
+  shipping_addl_regional: number
+  shipping_addl_metro: number
+  shipping_addl_national: number
+  shipping_addl_special: number
   store_pincode: string
   store_state: string
   delivery_charge_free_above: number

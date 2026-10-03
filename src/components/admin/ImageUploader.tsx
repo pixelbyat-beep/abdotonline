@@ -66,7 +66,7 @@ export function ImageUploader({
           <div key={img.id} className="group relative h-24 w-24 overflow-hidden rounded-btn border border-border">
             <img src={publicImageUrl(img.storage_path)} alt="" className="h-full w-full object-cover" />
             {img.is_primary && (
-              <span className="absolute left-1 top-1 rounded bg-accent px-1.5 py-0.5 text-[10px] font-bold text-black">Primary</span>
+              <span className="absolute left-1 top-1 rounded bg-accent px-1.5 py-0.5 text-[10px] font-bold text-on-accent">Primary</span>
             )}
             <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
               {!img.is_primary && (

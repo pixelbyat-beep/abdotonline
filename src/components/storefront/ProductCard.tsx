@@ -32,6 +32,7 @@ export function ProductCard({ product }: { product: ProductWithImages }) {
       image: image ? publicImageUrl(image.storage_path) : '',
       deliveryType: product.delivery_type,
       stockQty: product.stock_qty,
+      weightKg: product.weight_kg,
     })
     toast(`${product.name} added to cart`, 'success')
   }

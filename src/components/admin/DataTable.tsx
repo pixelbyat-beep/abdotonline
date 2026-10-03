@@ -26,9 +26,9 @@ export function DataTable<T>({
     <div className="overflow-x-auto rounded-card border border-border bg-bg-card">
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead>
-          <tr className="border-b border-border text-xs uppercase tracking-wide text-text-muted">
+          <tr className="border-b border-border bg-bg-elevated/60 text-[11px] uppercase tracking-wider text-text-secondary">
             {columns.map((col) => (
-              <th key={col.header} className="px-4 py-3 font-medium">
+              <th key={col.header} className="px-4 py-3 font-semibold">
                 {col.header}
               </th>
             ))}

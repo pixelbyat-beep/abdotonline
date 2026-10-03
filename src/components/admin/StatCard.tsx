@@ -27,21 +27,21 @@ export function StatCard({
 }) {
   const content = (
     <>
-      <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', toneClasses[tone])}>
-        <Icon size={18} />
+      <div className="flex items-center justify-between gap-2">
+        <p className="truncate text-xs font-medium text-text-secondary">{label}</p>
+        <span className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', toneClasses[tone])}>
+          <Icon size={16} />
+        </span>
       </div>
-      <div className="min-w-0">
-        <p className="truncate text-[13px] leading-tight text-text-secondary">{label}</p>
-        <p className="mt-1 truncate text-lg font-bold text-text-primary">{value}</p>
-      </div>
+      <p className="mt-2 truncate text-2xl font-bold tracking-tight text-text-primary">{value}</p>
     </>
   )
 
-  const className = 'flex items-center gap-3 rounded-card border border-border bg-bg-card p-4 transition-colors'
+  const className = 'flex flex-col rounded-card bg-bg-card p-4 transition-shadow'
 
   if (href) {
     return (
-      <Link to={href} className={cn(className, 'hover:border-accent/40 hover:bg-bg-elevated')}>
+      <Link to={href} className={cn(className, 'hover:shadow-md')}>
         {content}
       </Link>
     )

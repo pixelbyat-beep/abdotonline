@@ -35,7 +35,24 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-bold text-text-primary">Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">Store Metrics</p>
+          <h1 className="text-2xl font-bold tracking-tight text-text-primary">Dashboard Overview</h1>
+        </div>
+        <span className="flex items-center gap-1.5 rounded-full bg-success/10 px-3 py-1 text-xs font-semibold text-success">
+          <span className="h-1.5 w-1.5 rounded-full bg-success" /> Sync Active
+        </span>
+      </div>
+
+      {data && data.lowStock.length > 0 && (
+        <Link to="/admin/license-keys/low-stock" className="flex items-center gap-3 rounded-card bg-danger/10 p-4 text-danger">
+          <AlertTriangle size={20} className="shrink-0" />
+          <span className="text-sm">
+            <span className="font-semibold">Low inventory:</span> {data.lowStock.length} product{data.lowStock.length > 1 ? 's are' : ' is'} running low — restock soon.
+          </span>
+        </Link>
+      )}
 
       <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
         <StatCard label="Total Sales" value={isLoading ? '—' : formatINR(data?.totalSales ?? 0)} icon={IndianRupee} tone="success" href="/admin/reports/sales" />
@@ -58,7 +75,7 @@ export default function Dashboard() {
                   key={c}
                   onClick={() => setChart(c)}
                   className={`rounded-[4px] px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
-                    chart === c ? 'bg-accent text-black' : 'text-text-secondary hover:text-text-primary'
+                    chart === c ? 'bg-accent text-on-accent' : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
                   {c === 'sales' ? 'Sales' : 'New Customers'}
@@ -71,7 +88,7 @@ export default function Dashboard() {
                   key={r.key}
                   onClick={() => setRange(r.key)}
                   className={`rounded-[4px] px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    range === r.key ? 'bg-accent text-black' : 'text-text-secondary hover:text-text-primary'
+                    range === r.key ? 'bg-accent text-on-accent' : 'text-text-secondary hover:text-text-primary'
                   }`}
                 >
                   {r.label}

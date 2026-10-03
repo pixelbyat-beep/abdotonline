@@ -20,6 +20,7 @@
   --color-success: #22c55e;
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
+  --color-on-accent: #000000;
 
   --radius-card: 8px;
   --radius-xl: 12px;
@@ -85,4 +86,54 @@ h3,
 .scrollbar-thin::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   Admin panel theme — the "Stitch" design (Material-style light UI: soft blue-white
+   surfaces, #006194 primary, Inter, pill badges, shadowed white cards). Scoped to
+   .admin-theme so it re-skins every admin page through the shared tokens without
+   touching the storefront palette above.
+   --------------------------------------------------------------------------- */
+.admin-theme {
+  --color-bg-main: #f8f9ff;
+  --color-bg-card: #ffffff;
+  --color-bg-header: #f8f9ff;
+  --color-bg-elevated: #eff4ff;
+  --color-accent: #006194;
+  --color-accent-dark: #004b73;
+  --color-on-accent: #ffffff;
+  --color-text-primary: #0b1c30;
+  --color-text-secondary: #3f4850;
+  --color-text-muted: #707881;
+  --color-border: #dbe5f5;
+  --color-success: #006947;
+  --color-danger: #ba1a1a;
+  --color-warning: #b45309;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  color-scheme: light;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+.admin-theme .rounded-card {
+  box-shadow: 0 1px 3px rgba(11, 28, 48, 0.06);
+}
+
+.admin-theme .badge {
+  border-radius: 9999px;
+  padding-inline: 0.625rem;
+}
+
+.admin-theme ::selection {
+  background: #cce5ff;
+  color: #001d31;
+}
+
+.admin-theme input:focus,
+.admin-theme select:focus,
+.admin-theme textarea:focus {
+  box-shadow: 0 0 0 3px rgba(0, 97, 148, 0.15);
 }

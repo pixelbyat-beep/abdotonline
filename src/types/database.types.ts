@@ -49,6 +49,7 @@ export interface Database {
           delivery_type: 'email' | 'courier' | 'both'
           license_info: string | null
           stock_qty: number
+          weight_kg: number
           status: 'active' | 'inactive'
           featured: boolean
           meta_title: string | null

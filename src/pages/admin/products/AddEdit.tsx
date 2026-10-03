@@ -19,6 +19,7 @@ const EMPTY_FORM = {
   delivery_type: 'email' as 'email' | 'courier' | 'both',
   license_info: '',
   stock_qty: '0',
+  weight_kg: '0.5',
   status: 'active' as 'active' | 'inactive',
   featured: false,
   meta_title: '',
@@ -47,6 +48,7 @@ export default function ProductAddEdit() {
         delivery_type: product.delivery_type,
         license_info: product.license_info ?? '',
         stock_qty: String(product.stock_qty),
+        weight_kg: String(product.weight_kg ?? 0.5),
         status: product.status,
         featured: product.featured,
         meta_title: product.meta_title ?? '',
@@ -78,6 +80,7 @@ export default function ProductAddEdit() {
         delivery_type: form.delivery_type,
         license_info: form.license_info || null,
         stock_qty: Number(form.stock_qty),
+        weight_kg: Number(form.weight_kg) || 0,
         status: form.status,
         featured: form.featured,
         meta_title: form.meta_title || null,
@@ -115,6 +118,14 @@ export default function ProductAddEdit() {
           <Input label="Original / MRP Price (₹)" type="number" value={form.original_price} onChange={(e) => update('original_price', e.target.value)} />
           <Input label="License Info" placeholder="1 Device | 1 Year" value={form.license_info} onChange={(e) => update('license_info', e.target.value)} />
           <Input label="Stock Quantity" type="number" value={form.stock_qty} onChange={(e) => update('stock_qty', e.target.value)} />
+          <Input
+            label="Weight (kg, per unit)"
+            type="number"
+            step="0.01"
+            min="0"
+            value={form.weight_kg}
+            onChange={(e) => update('weight_kg', e.target.value)}
+          />
           <Select label="Status" value={form.status} onChange={(e) => update('status', e.target.value as typeof form.status)}>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
