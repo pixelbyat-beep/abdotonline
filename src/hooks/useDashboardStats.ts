@@ -75,6 +75,10 @@ export function useDashboardStats() {
         paidOrders30dRes,
         customers30dRes,
         orderItemsRes,
+        unusedKeysRes,
+        digitalOrdersRes,
+        courierOrdersRes,
+        openOrdersRes,
       ] = await Promise.all([
         supabase.from('orders').select('id', { count: 'exact', head: true }),
         supabase.from('orders').select('id', { count: 'exact', head: true }).gte('created_at', todayIso),
@@ -91,7 +95,7 @@ export function useDashboardStats() {
         supabase.from('orders').select('id', { count: 'exact', head: true }).eq('order_status', 'cancelled'),
         supabase
           .from('orders')
-          .select('id, order_number, guest_name, total, payment_status, order_status, created_at')
+          .select('id, order_number, guest_name, guest_email, total, payment_status, order_status, delivery_type, created_at, order_items(product_name_snapshot, qty)')
           .order('created_at', { ascending: false })
           .limit(10),
         supabase.from('orders').select('total, created_at').eq('payment_status', 'paid').gte('created_at', days30AgoIso),
@@ -100,6 +104,10 @@ export function useDashboardStats() {
           .from('order_items')
           .select('product_id, qty, price, product_name_snapshot, orders!inner(payment_status)')
           .eq('orders.payment_status', 'paid'),
+        supabase.from('license_keys').select('id', { count: 'exact', head: true }).eq('status', 'unused'),
+        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('delivery_type', 'email'),
+        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('delivery_type', 'courier'),
+        supabase.from('orders').select('id', { count: 'exact', head: true }).in('order_status', ['pending', 'processing']),
       ])
 
       const totalSales = (totalSalesRes.data ?? []).reduce((sum, o) => sum + Number(o.total), 0)
@@ -154,6 +162,10 @@ export function useDashboardStats() {
         refundedOrders: refundedOrdersRes.count ?? 0,
         cancelledOrders: cancelledOrdersRes.count ?? 0,
         lowStock,
+        unusedKeys: unusedKeysRes.count ?? 0,
+        digitalOrders: digitalOrdersRes.count ?? 0,
+        courierOrders: courierOrdersRes.count ?? 0,
+        openOrders: openOrdersRes.count ?? 0,
         recentOrders: recentOrdersRes.data ?? [],
         bestSellers,
         salesChart: buildChart(paidOrders30dRes.data ?? [], (r) => Number(r.total)),
