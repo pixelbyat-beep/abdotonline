@@ -1,18 +1,23 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { useCategories } from '@/hooks/useCategories'
+import { useHomeContent } from '@/hooks/useHomeContent'
 import { CategoryIcon } from '@/lib/categoryIcons'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 export function CategoryGrid() {
-  const { data: categories, isLoading } = useCategories()
+  const { data: allCategories, isLoading } = useCategories()
+  const { data: home } = useHomeContent()
+  const section = home!.categories
+  if (!section.enabled) return null
+  const categories = allCategories?.filter((c) => !section.hiddenIds.includes(c.id))
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-text-primary md:text-2xl">Browse Categories</h2>
-          <p className="mt-1 text-sm text-text-secondary">Find the exact tools you need.</p>
+          <h2 className="text-xl font-bold text-text-primary md:text-2xl">{section.title}</h2>
+          {section.subtitle && <p className="mt-1 text-sm text-text-secondary">{section.subtitle}</p>}
         </div>
         <Link
           to="/listing"

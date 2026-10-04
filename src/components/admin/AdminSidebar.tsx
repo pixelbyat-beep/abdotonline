@@ -14,6 +14,7 @@ import {
   BarChart3,
   FileText,
   Settings,
+  LayoutTemplate,
   ChevronDown,
   X,
   type LucideIcon,
@@ -91,6 +92,7 @@ const NAV: NavGroup[] = [
       { label: 'Add Tracking', href: '/admin/shipping/tracking-add' },
     ],
   },
+  { label: 'Home Page', icon: LayoutTemplate, href: '/admin/homepage', end: true },
   { label: 'Coupons & Deals', icon: Tag, href: '/admin/coupons', end: true },
   {
     label: 'Reviews',

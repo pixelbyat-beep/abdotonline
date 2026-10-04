@@ -32,6 +32,7 @@ import RevenueReport from './reports/RevenueReport'
 import ProductReport from './reports/ProductReport'
 import AllBlogs from './blogs/AllBlogs'
 import AddEditBlog from './blogs/AddEditBlog'
+import HomePageEditor from './homepage/HomePageEditor'
 import StoreSettings from './settings/StoreSettings'
 import PaymentSettings from './settings/PaymentSettings'
 import EmailSettings from './settings/EmailSettings'
@@ -97,6 +98,8 @@ export default function AdminRoutes() {
         <Route path="blogs" element={<AllBlogs />} />
         <Route path="blogs/new" element={<AddEditBlog />} />
         <Route path="blogs/:id" element={<AddEditBlog />} />
+
+        <Route path="homepage" element={<HomePageEditor />} />
 
         <Route path="settings" element={<StoreSettings />} />
         <Route path="settings/payment" element={<PaymentSettings />} />

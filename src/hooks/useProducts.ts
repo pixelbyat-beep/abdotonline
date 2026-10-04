@@ -37,6 +37,20 @@ export function useDealsProducts(limit = 4) {
   })
 }
 
+/** Hand-picked products for a home-page section; keeps the admin's chosen order and skips inactive products. */
+export function useProductsByIds(ids: string[]) {
+  return useQuery({
+    queryKey: ['products', 'by-ids', ids],
+    enabled: ids.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('products').select(PRODUCT_SELECT).eq('status', 'active').in('id', ids)
+      if (error) throw error
+      const byId = new Map((data as unknown as ProductWithImages[]).map((p) => [p.id, p]))
+      return ids.map((id) => byId.get(id)).filter((p): p is ProductWithImages => !!p)
+    },
+  })
+}
+
 export interface ProductListFilters {
   categorySlug?: string
   search?: string
