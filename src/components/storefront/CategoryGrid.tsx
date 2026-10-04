@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { useCategories } from '@/hooks/useCategories'
-import { useHomeContent } from '@/hooks/useHomeContent'
+import { sortByIdOrder, useHomeContent } from '@/hooks/useHomeContent'
 import { CategoryIcon } from '@/lib/categoryIcons'
 import { Skeleton } from '@/components/ui/Skeleton'
 
@@ -10,7 +10,7 @@ export function CategoryGrid() {
   const { data: home } = useHomeContent()
   const section = home!.categories
   if (!section.enabled) return null
-  const categories = allCategories?.filter((c) => !section.hiddenIds.includes(c.id))
+  const categories = allCategories && sortByIdOrder(allCategories.filter((c) => !section.hiddenIds.includes(c.id)), section.order)
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">

@@ -20,6 +20,8 @@ export interface HomeContent {
     title: string
     subtitle: string
     hiddenIds: string[]
+    /** Display order (category ids). Categories not listed come after, in their normal order. */
+    order: string[]
   }
   trending: {
     enabled: boolean
@@ -60,6 +62,7 @@ export const HOME_DEFAULTS: HomeContent = {
     title: 'Browse Categories',
     subtitle: 'Find the exact tools you need.',
     hiddenIds: [],
+    order: [],
   },
   trending: { enabled: true, title: 'Trending Software', limit: 4, productIds: [] },
   deals: {
@@ -70,6 +73,15 @@ export const HOME_DEFAULTS: HomeContent = {
     limit: 4,
     productIds: [],
   },
+}
+
+/** Sort items by a saved id order; anything not in the list keeps its relative position at the end. */
+export function sortByIdOrder<T extends { id: string }>(items: T[], order: string[]): T[] {
+  const rank = (id: string) => {
+    const i = order.indexOf(id)
+    return i === -1 ? order.length : i
+  }
+  return [...items].sort((a, b) => rank(a.id) - rank(b.id))
 }
 
 /** Merge saved JSON over the defaults section by section so a missing/partial value never breaks the page. */
