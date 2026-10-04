@@ -28,7 +28,7 @@ export function useDealsProducts(limit = 4) {
         .from('products')
         .select(PRODUCT_SELECT)
         .eq('status', 'active')
-        .gt('discount_pct', 0)
+        .eq('is_deal', true)
         .order('discount_pct', { ascending: false })
         .limit(limit)
       if (error) throw error
@@ -55,13 +55,15 @@ export interface ProductListFilters {
   categorySlug?: string
   search?: string
   brands?: string[]
+  /** Admin-ticked product flag: 'deals' = is_deal, 'new' = is_new_arrival. */
+  flag?: 'deals' | 'new'
   sort?: 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'deals'
   page?: number
   pageSize?: number
 }
 
 export function useProductsList(filters: ProductListFilters) {
-  const { categorySlug, search, brands, sort = 'newest', page = 1, pageSize = 12 } = filters
+  const { categorySlug, search, brands, flag, sort = 'newest', page = 1, pageSize = 12 } = filters
 
   return useQuery({
     queryKey: ['products', 'list', filters],
@@ -78,6 +80,8 @@ export function useProductsList(filters: ProductListFilters) {
       if (brands && brands.length > 0) {
         query = query.in('brand', brands)
       }
+      if (flag === 'deals') query = query.eq('is_deal', true)
+      if (flag === 'new') query = query.eq('is_new_arrival', true)
       if (sort === 'deals') query = query.gt('discount_pct', 0)
 
       switch (sort) {

@@ -17,14 +17,15 @@ export default function Listing() {
   const [params, setParams] = useSearchParams()
   const category = params.get('category') ?? undefined
   const filter = params.get('filter')
-  const sort = (params.get('sort') as 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'deals') || (filter === 'deals' ? 'deals' : 'newest')
+  const sort = (params.get('sort') as 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'deals') || 'newest'
   const page = Number(params.get('page') ?? '1')
   const selectedBrands = useMemo(() => params.getAll('brand'), [params])
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
+  const flag = filter === 'deals' || filter === 'new' ? filter : undefined
   const { data: categories } = useCategories()
   const { data: brands } = useProductBrands(category)
-  const { data, isLoading } = useProductsList({ categorySlug: category, sort, page, pageSize: PAGE_SIZE, brands: selectedBrands })
+  const { data, isLoading } = useProductsList({ categorySlug: category, flag, sort, page, pageSize: PAGE_SIZE, brands: selectedBrands })
 
   const activeCategory = useMemo(() => categories?.find((c) => c.slug === category), [categories, category])
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
@@ -84,7 +85,7 @@ export default function Listing() {
       </div>
 
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text-primary">{activeCategory ? activeCategory.name : 'All Products'}</h1>
+        <h1 className="text-2xl font-bold text-text-primary">{activeCategory ? activeCategory.name : flag === 'deals' ? 'Deals' : flag === 'new' ? 'New Arrivals' : 'All Products'}</h1>
         {activeCategory?.description && <p className="mt-1 text-sm text-text-secondary">{activeCategory.description}</p>}
       </div>
 

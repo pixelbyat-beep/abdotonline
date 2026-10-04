@@ -23,6 +23,8 @@ const EMPTY_FORM = {
   weight_kg: '0.5',
   status: 'active' as 'active' | 'inactive',
   featured: false,
+  is_deal: false,
+  is_new_arrival: false,
   meta_title: '',
   meta_description: '',
 }
@@ -52,6 +54,8 @@ export default function ProductAddEdit() {
         weight_kg: String(product.weight_kg ?? 0.5),
         status: product.status,
         featured: product.featured,
+        is_deal: product.is_deal,
+        is_new_arrival: product.is_new_arrival,
         meta_title: product.meta_title ?? '',
         meta_description: product.meta_description ?? '',
       })
@@ -84,6 +88,8 @@ export default function ProductAddEdit() {
         weight_kg: Number(form.weight_kg) || 0,
         status: statusOverride ?? form.status,
         featured: form.featured,
+        is_deal: form.is_deal,
+        is_new_arrival: form.is_new_arrival,
         meta_title: form.meta_title || null,
         meta_description: form.meta_description || null,
       })
@@ -198,10 +204,30 @@ export default function ProductAddEdit() {
             </Select>
           </div>
           <Textarea label="Summary Overview" rows={4} value={form.description} onChange={(e) => update('description', e.target.value)} />
-          <label className="flex items-center gap-2 text-sm text-text-primary">
-            <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="accent-accent" />
-            Featured on homepage
-          </label>
+          <div className="flex flex-col gap-2.5 rounded-btn border border-border p-3.5">
+            <p className="text-sm font-semibold text-text-primary">Show this product in</p>
+            <label className="flex items-start gap-2.5 text-sm text-text-primary">
+              <input type="checkbox" checked={form.is_new_arrival} onChange={(e) => update('is_new_arrival', e.target.checked)} className="mt-0.5 accent-accent" />
+              <span>
+                New Arrivals
+                <span className="block text-xs text-text-secondary">Appears when customers click "New Arrivals".</span>
+              </span>
+            </label>
+            <label className="flex items-start gap-2.5 text-sm text-text-primary">
+              <input type="checkbox" checked={form.is_deal} onChange={(e) => update('is_deal', e.target.checked)} className="mt-0.5 accent-accent" />
+              <span>
+                Deals
+                <span className="block text-xs text-text-secondary">Appears when customers click "Deals".</span>
+              </span>
+            </label>
+            <label className="flex items-start gap-2.5 text-sm text-text-primary">
+              <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="mt-0.5 accent-accent" />
+              <span>
+                Featured on homepage
+                <span className="block text-xs text-text-secondary">Shown in Trending Software when that section is on automatic.</span>
+              </span>
+            </label>
+          </div>
         </section>
 
         <section className={card}>

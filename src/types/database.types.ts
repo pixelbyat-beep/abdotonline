@@ -52,6 +52,8 @@ export interface Database {
           weight_kg: number
           status: 'active' | 'inactive'
           featured: boolean
+          is_deal: boolean
+          is_new_arrival: boolean
           meta_title: string | null
           meta_description: string | null
           rating_avg: number

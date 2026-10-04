@@ -4,7 +4,6 @@ export const STORE_TAGLINE = 'Smart. Secure. Genuine.'
 export const NAV_LINKS = [
   { label: 'Home', href: '/' },
   { label: 'Categories', href: '/listing' },
-  { label: 'Deals', href: '/listing?filter=deals' },
   { label: 'New Arrivals', href: '/listing?filter=new' },
   { label: 'All Products', href: '/listing' },
   { label: 'Support', href: '/contact' },
