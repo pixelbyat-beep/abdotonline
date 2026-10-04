@@ -60,13 +60,16 @@ export interface ProductListFilters {
   sort?: 'newest' | 'price_asc' | 'price_desc' | 'rating' | 'deals'
   page?: number
   pageSize?: number
+  /** Set false to skip the request (e.g. a fallback list only needed when the main list is empty). */
+  enabled?: boolean
 }
 
 export function useProductsList(filters: ProductListFilters) {
-  const { categorySlug, search, brands, flag, sort = 'newest', page = 1, pageSize = 12 } = filters
+  const { categorySlug, search, brands, flag, sort = 'newest', page = 1, pageSize = 12, enabled = true } = filters
 
   return useQuery({
     queryKey: ['products', 'list', filters],
+    enabled,
     queryFn: async () => {
       let query = supabase.from('products').select(PRODUCT_SELECT, { count: 'exact' }).eq('status', 'active')
 

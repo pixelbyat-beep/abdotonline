@@ -27,6 +27,9 @@ export default function Listing() {
   const { data: brands } = useProductBrands(category)
   const { data, isLoading } = useProductsList({ categorySlug: category, flag, sort, page, pageSize: PAGE_SIZE, brands: selectedBrands })
 
+  const showFallback = !isLoading && (data?.products.length ?? 0) === 0
+  const { data: fallback } = useProductsList({ sort: 'newest', page: 1, pageSize: 4, enabled: showFallback })
+
   const activeCategory = useMemo(() => categories?.find((c) => c.slug === category), [categories, category])
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1
 
@@ -181,8 +184,29 @@ export default function Listing() {
               : data?.products.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
 
-          {!isLoading && data?.products.length === 0 && (
-            <div className="py-16 text-center text-text-secondary">No products found.</div>
+          {!isLoading && (data?.products.length ?? 0) === 0 && (
+            <div className="py-12 text-center">
+              <p className="text-lg font-semibold text-text-primary">
+                {flag === 'deals' ? 'No deals available right now' : flag === 'new' ? 'No new arrivals right now' : 'No products found'}
+              </p>
+              <p className="mt-1 text-sm text-text-secondary">Check back soon, or have a look at our other products.</p>
+              <Link
+                to="/listing"
+                className="mt-5 inline-block rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-dark"
+              >
+                Explore other products
+              </Link>
+              {fallback?.products && fallback.products.length > 0 && (
+                <div className="mt-10 text-left">
+                  <h2 className="mb-4 text-base font-bold text-text-primary">You may also like</h2>
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+                    {fallback.products.map((p) => (
+                      <ProductCard key={p.id} product={p} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           <div className="mt-8">

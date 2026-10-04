@@ -29,6 +29,12 @@ const EMPTY_FORM = {
   meta_description: '',
 }
 
+/** Supabase errors are plain objects, not Error instances, so read .message directly. */
+function errorMessage(e: unknown): string {
+  if (e && typeof e === 'object' && 'message' in e) return String((e as { message: unknown }).message)
+  return 'unknown error'
+}
+
 export default function ProductAddEdit() {
   const { id } = useParams()
   const isNew = !id || id === 'new'
@@ -72,8 +78,7 @@ export default function ProductAddEdit() {
       return
     }
     setSaving(true)
-    try {
-      const savedId = await saveProduct.mutateAsync({
+    const payload = {
         id: isNew ? undefined : id,
         name: form.name,
         slug: slugify(form.name),
@@ -92,12 +97,29 @@ export default function ProductAddEdit() {
         is_new_arrival: form.is_new_arrival,
         meta_title: form.meta_title || null,
         meta_description: form.meta_description || null,
-      })
+    }
+    try {
+      let savedId: string
+      let flagsSkipped = false
+      try {
+        savedId = await saveProduct.mutateAsync(payload)
+      } catch (e) {
+        // Database hasn't had migration 011 (is_deal / is_new_arrival columns) applied yet:
+        // still save everything else so the admin isn't blocked, and say what's missing.
+        if (!/is_deal|is_new_arrival/.test(errorMessage(e))) throw e
+        const { is_deal: _d, is_new_arrival: _n, ...rest } = payload
+        savedId = await saveProduct.mutateAsync(rest)
+        flagsSkipped = true
+      }
       if (statusOverride) update('status', statusOverride)
-      toast(statusOverride === 'inactive' ? 'Draft saved' : 'Product saved', 'success')
+      if (flagsSkipped) {
+        toast('Saved, but Deals / New Arrivals were NOT saved: run supabase/migrations/011_product_deal_new_flags.sql in the Supabase SQL Editor first', 'error')
+      } else {
+        toast(statusOverride === 'inactive' ? 'Draft saved' : 'Product saved', 'success')
+      }
       if (isNew) navigate(`/admin/products/${savedId}`)
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Could not save product', 'error')
+      toast(`Could not save product: ${errorMessage(e)}`, 'error')
     } finally {
       setSaving(false)
     }
